@@ -81,4 +81,5 @@ Then go to the project directory and run
 ```sh
 $ python manage.py runserver
 ```
-
+* **
+Here is a video that introduce the project: [Instado](https://www.youtube.com/watch?v=Cc7H6JNs_hA&t=3s)
