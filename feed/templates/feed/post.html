@@ -1,0 +1,85 @@
+{% extends "accounts/layout.html" %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block cssfiles %}
+{% endblock cssfiles %}
+
+{% block jsfiles %}
+<script type="text/javascript" src="{% static 'feed/action.js' %}"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function(){
+        document.querySelectorAll('.like-btn').forEach(button => {
+            button.onclick = function(){
+                like_post(this, event);
+            }
+        })
+        document.getElementById('comment').value = '';
+        document.getElementById('comment-form').addEventListener('submit', () => comment_post(event))
+    })
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12">
+        <div class="card card-signin">
+            <div class="card-body">
+                <a href="{{ post.creator.profile.get_absolute_url }}"><img src="{{ post.creator.profile.image.url }}"
+                        class="rounded-circle" width="30" height="30"></a>
+                <a class="text-dark" href="{{ post.user_name.profile.get_absolute_url }}">
+                    <b>{{ post.creator}}</b>
+                </a>
+                <br><small class="text-muted">Posted on {{ post.date_posted }}</small>
+                <br><br>
+                <p class="card-text text-dark">{{ post.caption }}</p>
+            </div>
+            <a><img class="card-img-top" src="{{ post.image.url }}"></a>
+            <div class="card-footer">
+                {% if post not in liked_post %}
+                <button class="btn btn-outline-primary like-btn" id="like-btn-{{ post.id }}" data-post="{{ post.id }}">
+                    <i class="far fa-thumbs-up"></i> Like
+                    <span class="badge badge-light" >{{ post.likes.count }}</span>
+                </button>
+                {% else %}
+                <button class="btn btn-primary like-btn" id="like-btn-{{ post.id }}" data-post="{{ post.id }}">
+                    <i class="far fa-thumbs-up"></i> Like
+                    <span class="badge badge-light" >{{ post.likes.count }}</span>
+                </button>
+                {% endif %}
+                    <form class="mt-2" id="comment-form" method="POST" >
+                        <input type="hidden" id="post_id" value="{{ post.id }}">
+                        <div class="form-row align-items-center">
+                            <div class="col-sm-12 col-md-9 col-lg-9 form-group ">
+                                <input type="text" id="comment" class="form-control" placeholder="Add your comment">
+                            </div>
+                            <div class="col-auto form-group">
+                                <button type="submit" class="btn btn-primary " >
+                                     Comment
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6 col-md-6 col-xs-12 d-flex flex-column" id="post-details" style="max-height:800px; overflow: auto;">
+        <h4>Comments</h4>
+        {% if post.comments.all %}
+        {% for cmt in post.comments.all %}
+        <div class="comments-body">
+            <a href="{{ cmt.createdBy.profile.get_absolute_url }}">
+                <img src="{{ cmt.createdBy.profile.image.url }}" class="rounded-circle" width="30" height="30">
+            </a>
+            <a class="text-dark" href="{{ cmt.createdBy.profile.get_absolute_url }}"><b>{{ cmt.createdBy }}</b></a>
+            <br><small>{{ cmt.createdOn }}</small><br><br>
+            <p class="card-text text-dark">{{ cmt.content }}</p>
+            <hr class="my-1">
+        </div>
+        {% endfor %}
+        {% else %}
+        <p>No comments to show!</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock content %}
